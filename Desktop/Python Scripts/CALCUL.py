@@ -1,18 +1,31 @@
+"""
+PROJET: JEU ELEMENTAIRE "Jeux de serpent "
+proprietaire: KYM Marius KOUYOE
+DEVELLOPEUR : KYM Marius KOUYOE , CEO of KYM Dev Corp
+Description:
+
+L'idee m'est venue aprés avoir vue une partie du scripts du jeu dans mon livre d"apprentissage de python ""
+j' ai alors de pratiquer et de perfectionne la version initiale 
+ceci ma permis de me familliariser avec la bibliotecque tkinter et ses outils 
+cet fut un bon exercice pour mes debut en programmation  
+
+"""
 from tkinter import * 
 from random import randrange
 # === Définition de quelques gestionnaires d'événements ========: 
 
 #fonction definissant l'apparition aleatoire des boules
-    
-#fonction definissant le debut du jeux!!!§§
 def eat( a,b):
     return can.create_oval(a,b,a+10,b+10,width=1,fill='red')
+
+#fonction definissant le debut du jeux!!!§§
 def start_it(): 
     "Démarrage de l'animation" 
     global flag 
     if flag ==0: 
         flag =1 
         move() 
+        
 #fonction definissant l'arret du jeux         
 def stop_it(): 
     "Arrêt de l'animation" 
@@ -36,11 +49,13 @@ def collision( ):
 #definition de la fonction qui surveille la collision du serpent avec lui meme
 #*************************************************************************************
 def collision_b():
-    global serp 
-    for i in serp:
-        serp 
+    global serp,xmove,ymove
+    for i in serp[:-1]:
+        if i[1]==xmove and i[2]==ymove:
+            return 0
+        
 
-
+    return 1   
 
 
 
@@ -52,7 +67,7 @@ def collision_b():
 # Defnition de la fonction qui gere les niveau du jeu : facile , intermediare ,difficile
 # ***************************************************************************************
 def niveau():  
-    global niv,vitesse  
+    global niv,vitesse ,bou3
     if niv==1:
             vitesse=80
             niv=2
@@ -67,29 +82,63 @@ def niveau():
     else :
         niv =1
         vitesse=200
+    can.delete("niveau")  
+    bou4.config(text=f"niveau {niv}")
+
     return niv ,vitesse            
     
 
-    # ****************************************************
+    # **********************************************************************************
 #definition des fonction regissant les deplacement en general
-    # ***************************************************** 
-    # *****************************************************
+    # ***************************************************** ****************************
+    # ********************************************************************************** 
 def go_left(event =None): 
     "délacement vers la gauche" 
- 
-    global dx, dy 
-    dx, dy = -1, 0 
+    global dx, dy ,serp
+
+    c,d=serp[len(serp)-1],serp[0]
+    if dx==-1 and dy==0:
+        return
+    if c[2]==d[2]:
+         dx,dy == 1, 0 
+            
+        
+  
+    else:    
+      dx, dy = -1, 0 
+      return 
+
 def go_right(event =None): 
-    global dx, dy 
-    dx, dy = 1, 0 
+    
+    global dx, dy ,serp
+    c,d=serp[len(serp)-1],serp[0]
+    if dx==1 and dy==0:
+        return
+    if c[2]==d[2]:
+        dx,dy=-1,0
+    else:    
+      dx, dy = 1, 0 
+
 def go_up(event =None): 
     "déplacement vers le haut" 
-    global dx, dy 
-    dx, dy = 0, -1 
+    global dx, dy ,serp
+    c,d=serp[len(serp)-1],serp[0]
+    if dx==0 and dy==-1:
+        return
+    if c[1]==d[1]:
+        dx,dy=0,1
+    else:
+      dx, dy = 0, -1 
     
 def go_down(event =None): 
-    global dx, dy 
-    dx, dy = 0, 1 
+    global dx, dy ,serp
+    c,d=serp[len(serp)-1],serp[0]
+    if dx==0 and dy==1:
+        return
+    if c[1]==d[1]:
+        dx,dy=0,-1
+    else:
+      dx, dy = 0, 1 
     
 def move(): 
     "Animation du serpent par récursivité" 
@@ -154,13 +203,41 @@ def move():
         new = can.create_rectangle(xq, yq, xq + cc, yq + cc, fill="yellow")
         serp.append([new ,xq, yq])  # Mémorisation du nouveau carré de tête
       #on efface l"ancien ovale
-       
-       
-
+        f = open ("PROJET_Gestion_stocks/requirement.txt" , 'a' )
+        f.write(f"{score}")
+ 
+        f . close ()  
         return 
-
+    
+    if collision_b()==False:
+        
+        flag =0             # => arrêt de l'animation 
+        can.create_text(canX/2, 200, anchor =CENTER, text ="GAME OVER!!!", 
+      
+                      fill ="red", font="italic 50 bold") 
+        
     can.coords(cq, xq, yq, xq + cc, yq + cc)  # déplacement effectif 
     return
+def rejouer():
+    global x,y,serp,aleax,aleay,score,niv,vitesse,flag
+    # Réinitialisation des variables
+    x, y, cc = 100, 100, 12
+    niv, vitesse = 1, 200
+    score = 0
+    serp=[]
+    can.delete('all')
+    oval=can.create_oval(aleax,aleay,aleax+10,aleay+10,width=1,fill='red')
+    i =0 
+    while i <5: 
+        carre =can.create_rectangle(x, y, x+cc, y+cc, fill="RED") 
+        # Pour chaque carré, on mémorise une petite sous-liste contenant 
+    # 3 éléments : la référence du carré et ses coordonnées de base : 
+        serp.append([carre, x, y]) 
+        x =x+cc                 # le carré suivant sera un peu plus à droite 
+        i =i+1 
+    #start_it()   
+
+
     
     
 
@@ -200,8 +277,10 @@ bou1 =Button(fen, text="Start", width =10, command =start_it)
 bou1.pack(side =LEFT) 
 bou2 =Button(fen, text="Stop", width =10, command =stop_it) 
 bou2.pack(side =LEFT) 
-bou3 =Button(fen, text=f"niveau {niv},", width =10, command =niveau) 
+bou3 =Button(fen, text="rejouer", width =10, command =rejouer) 
 bou3.pack(side =RIGHT) 
+bou4 =Button(fen, text=f"niveau {niv},", width =10, command =niveau) 
+bou4.pack(side =RIGHT) 
 # Association de gestionnaires d'événements aux touches fléchées du clavier : 
 fen.bind("<Left>", go_left)         # Attention : les événements clavier 
 fen.bind("<Right>", go_right)       # doivent toujours être associés à la 
@@ -223,6 +302,9 @@ while i <5:
     i =i+1 
 
         # Initialisation des coordonnées de la tête du serpent
-xmove, ymove = serp[-1][1], serp[-1][2]  # Coordonnées de la tête (dernier carré)   
-fen.mainloop()  
+xmove, ymove = serp[-1][1], serp[-1][2]  # Coordonnées de la tête (dernier carré)
+print(serp[1]) 
+ 
+fen.mainloop()
+
 # fen.destroy()
